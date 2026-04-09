@@ -1,0 +1,39 @@
+name: Deploy to IONOS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare deployment
+        run: |
+          # Copy PHP src into public for deployment
+          cp -r src/ public/src/
+
+          # Copy setup script
+          cp setup.php public/setup.php
+
+          # Create .htaccess for uploads directory (security)
+          mkdir -p public/uploads
+          echo 'php_flag engine off' > public/uploads/.htaccess
+
+          # Remove uploads dir content (symlink will be created post-deploy)
+          # Keep .htaccess
+          find public/uploads -type f ! -name '.htaccess' -delete 2>/dev/null || true
+
+      - name: Deploy to IONOS
+        uses: ionos-deploy-now/deploy-to-ionos@v1
+        with:
+          project-id: ${{ secrets.IONOS_PROJECT_ID }}
+          branch-id: ${{ secrets.IONOS_BRANCH_ID }}
+          service-host: ${{ secrets.IONOS_SERVICE_HOST }}
+          service-port: ${{ secrets.IONOS_SERVICE_PORT }}
+          dist-folder: ./public
+          runtime-config: .deploy-now/3dprint/config.yaml

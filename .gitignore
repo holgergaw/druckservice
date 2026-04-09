@@ -1,0 +1,22 @@
+# Environment
+.env
+
+# Uploads (local dev)
+public/uploads/models/
+public/uploads/catalog/
+uploads/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Dependencies (none for now)
+vendor/
+node_modules/

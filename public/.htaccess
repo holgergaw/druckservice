@@ -1,0 +1,17 @@
+Options +FollowSymLinks -Indexes
+RewriteEngine On
+
+# Block direct access to src/
+RewriteRule ^src/ - [F,L]
+
+# API requests -> front controller
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^api/(.*)$ api/index.php [QSA,L]
+
+# Uploaded files -> serve directly via symlink
+RewriteRule ^uploads/(.*)$ uploads/$1 [L]
+
+# SPA fallback: everything else -> index.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . index.html [L]
