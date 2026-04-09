@@ -14,7 +14,7 @@ on:
         type: string
 
 env:
-  DEPLOYMENT_FOLDER: ./public
+  DEPLOYMENT_FOLDER: ./
 
 jobs:
 # Please do not rename this job
@@ -26,18 +26,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: 'recursive'
-
-      - name: Prepare deployment
-        run: |
-          # Copy PHP backend into public/ for deployment
-          cp -r src/ public/src/
-          # Copy setup script
-          cp setup.php public/setup.php
-          # Security: block PHP execution in uploads dir
-          mkdir -p public/uploads
-          echo 'php_flag engine off' > public/uploads/.htaccess
-          # Remove uploads content (symlink will be set post-deploy)
-          find public/uploads -type f ! -name '.htaccess' -delete 2>/dev/null || true
 
       - name: Render templates
         uses: ionos-deploy-now/template-renderer-action@v2
@@ -53,7 +41,7 @@ jobs:
         with:
           api-key: ${{ secrets.IONOS_API_KEY }}
           service-host: api-eu.ionos.space
-          project-id: 2093b2c9-2b00-4c7d-bbe3-8d85b5aa8624
+          project-id: 2f11a8c1-4020-40aa-a9dc-b3b2c8bf3fe1
           branch-id: ${{ inputs.branch-id }}
           version: ${{ github.sha }}
           folder: ${{ env.DEPLOYMENT_FOLDER }}
