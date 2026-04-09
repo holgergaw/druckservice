@@ -1,0 +1,49 @@
+# To better understand this file read this:
+# https://docs.ionos.space/docs/github-actions-customization/
+
+name: "Deploy Now: Execute Build"
+
+on:
+  workflow_call:
+    inputs:
+      site-url:
+        required: true
+        type: string
+      branch-id:
+        required: true
+        type: string
+
+env:
+  DEPLOYMENT_FOLDER: ./
+
+jobs:
+# Please do not rename this job
+  build-project:
+    name: build druckservice
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Render templates
+        uses: ionos-deploy-now/template-renderer-action@v2
+        id: template
+        with:
+          input-directory: .deploy-now/druckservice
+          output-directory: ${{ env.DEPLOYMENT_FOLDER }}
+          intermediate-data-file: ${{ env.DEPLOYMENT_FOLDER }}/.template-renderer-data
+
+# Please do not touch the following action
+      - name: Store deployment content
+        uses: ionos-deploy-now/artifact-action@v1
+        with:
+          api-key: ${{ secrets.IONOS_API_KEY }}
+          service-host: api-eu.ionos.space
+          project-id: 1abeede5-0efa-4126-9fad-c4234925ebde
+          branch-id: ${{ inputs.branch-id }}
+          version: ${{ github.sha }}
+          folder: ${{ env.DEPLOYMENT_FOLDER }}
+          config-file: .deploy-now/druckservice/config.yaml
+          action: upload
